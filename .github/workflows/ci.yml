@@ -44,3 +44,49 @@ jobs:
         run: dotnet restore
       - name: Run backend tests
         run: dotnet test
+name: CI/CD Ubisoft
+
+# Événements déclencheurs
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  # Job frontend
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install   
+      - name: Run frontend tests
+        run: npm test
+      - name: Lint code
+        run: npx eslint . --ext .js
+
+  # Job backend
+  backend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Run backend tests
+        run: dotnet test
